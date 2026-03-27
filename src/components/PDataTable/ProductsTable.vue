@@ -6,240 +6,369 @@ import router from "@/router/index.js";
 const search = ref("");
 const selectedCategory = ref("all");
 
-// Filtrelenmiş ürün listesi
 const filteredProducts = computed(() => {
-  return Menu.categories.map(category => ({
-    ...category,
-    products: category.products.filter(
+  return Menu.categories
+    .map(category => ({
+      ...category,
+      products: category.products.filter(
         p =>
-            (selectedCategory.value === "all" || p.category_id === selectedCategory.value) &&
-            p.name.toLowerCase().includes(search.value.toLowerCase())
-    ),
-  }));
+          (selectedCategory.value === "all" || p.category_id === selectedCategory.value) &&
+          p.status == 1 &&
+          p.name.toLowerCase().includes(search.value.toLowerCase())
+      ),
+    }))
+    .filter(c => c.products.length > 0);
 });
 
-const table = localStorage.getItem('table') ?? null;
+const hasResults = computed(() => filteredProducts.value.length > 0);
 
-const order = ()  => {
-  return router.push({ path: `/tables/${table}` });
-}
+const table = localStorage.getItem("table") ?? null;
 const rawUserData = localStorage.getItem("userData");
 const userData = rawUserData ? JSON.parse(rawUserData) : null;
+
+const goOrder = () => router.push({ path: `/tables/${table}` });
 </script>
 
 <template>
-  <section class="menu-container">
-    <!-- Başlık -->
-    <div class="menu-header">
-      <h1>{{userData?.name}} Menü</h1>
-      <p class="mt-4"> {{userData.slogan}}</p>
+  <div class="qr-root">
 
-      <button @click="order">Sipariş Ver</button>
-    </div>
-
-    <!-- Filtre -->
-    <div class="filter-bar">
-      <select v-model="selectedCategory">
-        <option value="all">Tüm Kategoriler</option>
-        <option v-for="cat in Menu.categories" :key="cat.id" :value="cat.id">
-          {{ cat.name }}
-        </option>
-      </select>
-      <input v-model="search" type="text" placeholder="Ürün ara..." />
-    </div>
-
-    <p class="text-center mb-4">Kategorilere göre filtreleyin veya ürün arayın</p>
-
-    <!-- Menü Listesi -->
-    <div v-for="category in filteredProducts" :key="category.id" class="category-section">
-      <div v-if="category.products.length > 0">
-        <h2 class="py-4 mt-3">{{ category.name }}</h2>
-
-        <div class="product-grid">
-          <div v-for="product in category.products" :key="product.id" class="product-card">
-            <div class="product-img">
-              <img :src="product.image" :alt="product.name" />
-            </div>
-            <div class="product-info">
-              <h3>{{ product.name }}</h3>
-              <p class="details">{{ product.details }}</p>
-              <p class="price">₺{{ product.price }}</p>
-            </div>
-          </div>
+    <!-- Header -->
+    <div class="qr-header">
+      <div class="qr-header-brand">
+        <div class="qr-header-icon">
+          <ion-icon name="restaurant-outline" style="font-size:20px; color:#4f46e5;"></ion-icon>
         </div>
+        <div>
+          <div class="qr-header-name">{{ userData?.name ?? 'Menü' }}</div>
+          <div class="qr-header-slogan" v-if="userData?.slogan">{{ userData.slogan }}</div>
+        </div>
+      </div>
+      <button v-if="table" class="qr-order-btn" @click="goOrder">
+        <ion-icon name="cart-outline" style="font-size:15px;"></ion-icon>
+        Sipariş Ver
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="qr-search-wrap">
+      <div class="qr-search-inner">
+        <ion-icon name="search-outline" class="qr-search-icon"></ion-icon>
+        <input
+          v-model="search"
+          type="text"
+          placeholder="Ürün ara..."
+          class="qr-search"
+        />
       </div>
     </div>
 
-    <div v-if="filteredProducts.every(c => c.products.length === 0)" class="no-products">
-      Gösterilecek ürün bulunamadı ☕
+    <!-- Category tabs -->
+    <div class="qr-cats no-scrollbar">
+      <button
+        class="qr-cat"
+        :class="{ 'qr-cat--active': selectedCategory === 'all' }"
+        @click="selectedCategory = 'all'"
+      >
+        Tümü
+      </button>
+      <button
+        v-for="cat in Menu.categories"
+        :key="cat.id"
+        class="qr-cat"
+        :class="{ 'qr-cat--active': selectedCategory === cat.id }"
+        @click="selectedCategory = cat.id"
+      >
+        {{ cat.name }}
+      </button>
     </div>
-  </section>
+
+    <!-- Products -->
+    <div class="qr-content">
+      <template v-if="hasResults">
+        <div v-for="category in filteredProducts" :key="category.id" class="qr-section">
+          <div class="qr-section-title">{{ category.name }}</div>
+          <div class="qr-grid">
+            <div
+              v-for="product in category.products"
+              :key="product.id"
+              class="qr-card"
+            >
+              <div class="qr-card-icon">
+                <ion-icon name="fast-food-outline" style="font-size:22px; color:#a5b4fc;"></ion-icon>
+              </div>
+              <div class="qr-card-body">
+                <div class="qr-card-name">{{ product.name }}</div>
+                <div class="qr-card-desc" v-if="product.details">{{ product.details }}</div>
+              </div>
+              <div class="qr-card-price">₺{{ product.price }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <div v-else class="qr-empty">
+        <ion-icon name="search-outline" style="font-size:40px; color:#c7d2fe; display:block; margin:0 auto 12px;"></ion-icon>
+        <div class="qr-empty-title">Ürün bulunamadı</div>
+        <div class="qr-empty-sub">Farklı bir kategori veya arama deneyin</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="qr-footer">
+      <ion-icon name="shield-checkmark-outline" style="font-size:12px; margin-right:4px;"></ion-icon>
+      GoAdisyon · Dijital Menü
+    </div>
+
+  </div>
 </template>
 
-<style scoped>
-/* === GENEL === */
-.menu-container {
-  background: linear-gradient(to bottom, #000000, #1a1a1a);
-  color: #fff;
-  font-family: "Raleway", sans-serif;
+<style scoped lang="scss">
+.qr-root {
   min-height: 100vh;
-  padding: 60px 20px;
-}
-
-/* === BAŞLIK === */
-.menu-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
-.menu-header h1 {
-  font-family: "Oswald", sans-serif;
-  font-size: 48px;
-  color: #caa76a;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-.menu-header p {
-  color: #ccc;
-  margin-top: 10px;
-  font-size: 18px;
-}
-
-/* === FİLTRE === */
-.filter-bar {
+  background: #f8fafc;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-.filter-bar select,
-.filter-bar input {
-  background: #111;
-  color: #caa76a;
-  border: 1px solid #caa76a;
-  border-radius: 6px;
-  padding: 10px 15px;
-  font-size: 15px;
-  outline: none;
-  transition: 0.3s;
-}
-.filter-bar select:hover,
-.filter-bar input:focus {
-  background: #222;
-  box-shadow: 0 0 10px rgba(202, 167, 106, 0.3);
+  flex-direction: column;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
-/* === KATEGORİ BAŞLIKLARI === */
-.category-section h2 {
-  color: #caa76a;
-  font-size: 24px;
-  border-bottom: 2px solid #caa76a;
-  margin-bottom: 25px;
-  text-transform: uppercase;
-}
-
-/* === ÜRÜN GRID === */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 25px;
-}
-
-/* === KART === */
-.product-card {
+/* Header */
+.qr-header {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(202, 167, 106, 0.3);
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.qr-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qr-header-icon {
+  width: 40px;
+  height: 40px;
+  background: #eef2ff;
   border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(202, 167, 106, 0.25);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* === RESİM === */
-.product-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  width: 130px;
-  height: 130px;
-  overflow: hidden;
-}
-.product-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.4s ease;
-}
-.product-card:hover img {
-  transform: scale(1.1);
 }
 
-/* === BİLGİ === */
-.product-info {
-  padding: 15px 20px;
-  flex: 1;
+.qr-header-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
 }
-.product-info h3 {
+
+.qr-header-slogan {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.qr-order-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #4f46e5;
   color: #fff;
-  font-size: 19px;
-  font-weight: 600;
-  margin-bottom: 6px;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+
+  &:hover { background: #4338ca; }
 }
-.product-info .details {
-  color: #aaa;
+
+/* Search */
+.qr-search-wrap {
+  padding: 12px 16px 0;
+}
+
+.qr-search-inner {
+  position: relative;
+}
+
+.qr-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.qr-search {
+  width: 100%;
+  height: 42px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 12px 0 38px;
   font-size: 14px;
-  line-height: 1.4;
+  color: #1e293b;
+  font-family: inherit;
+  transition: border-color 0.15s;
+
+  &::placeholder { color: #94a3b8; }
+  &:focus { border-color: #6366f1; }
+}
+
+/* Category tabs */
+.qr-cats {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.qr-cat {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+
+  &:hover { background: #f8fafc; }
+
+  &--active {
+    background: #4f46e5;
+    color: #fff;
+    border-color: #4f46e5;
+  }
+}
+
+/* Content */
+.qr-content {
+  flex: 1;
+  padding: 4px 16px 24px;
+}
+
+.qr-section {
+  margin-bottom: 24px;
+}
+
+.qr-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-bottom: 10px;
-}
-.product-info .price {
-  color: #caa76a;
-  font-weight: bold;
-  font-size: 17px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #eef2ff;
 }
 
-/* === ÜRÜN YOKSA === */
-.no-products {
+.qr-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Card */
+.qr-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #f1f5f9;
+  padding: 12px 14px;
+  transition: border-color 0.12s;
+
+  &:hover { border-color: #c7d2fe; }
+}
+
+.qr-card-icon {
+  width: 44px;
+  height: 44px;
+  background: #f8fafc;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qr-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.qr-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+.qr-card-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qr-card-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: #4f46e5;
+  flex-shrink: 0;
+}
+
+/* Empty */
+.qr-empty {
+  padding: 60px 16px;
   text-align: center;
-  color: #888;
-  margin-top: 80px;
-  font-size: 18px;
 }
 
-/* === RESPONSIVE === */
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .menu-header h1 {
-    font-size: 36px;
-  }
-
-  /* Kart mobilde de yatay kalacak */
-  .product-card {
-    flex-direction: row; /* column yerine row */
-    text-align: left;    /* içerik sola hizalı */
-    flex-wrap: wrap;     /* küçük ekranlarda taşmayı önler */
-  }
-
-  .product-img {
-    width: 120px;   /* daha küçük ekran için uygun boyut */
-    height: 120px;  /* aynı oran korunur */
-  }
-
-  .product-info {
-    padding: 10px 15px;
-    flex: 1;
-  }
-
-  .product-grid {
-    gap: 15px; /* mobilde daha küçük boşluk */
-  }
+.qr-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 4px;
 }
 
+.qr-empty-sub {
+  font-size: 12px;
+  color: #94a3b8;
+}
 
+/* Footer */
+.qr-footer {
+  padding: 16px;
+  text-align: center;
+  font-size: 11px;
+  color: #cbd5e1;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>
-
