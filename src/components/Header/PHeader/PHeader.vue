@@ -2,13 +2,16 @@
   <header class="header py-2">
     <div class="container header-row">
       <div class="header-left d-flex">
-        <h2 class="text-white mt-2">{{userData ? userData.name : ''}}</h2>
-        <PHeaderNav/>
+        <div class="header-brand">
+          <span class="brand-logo">Go</span><span class="brand-name">Adisyon</span>
+        </div>
+        <div class="header-divider"></div>
+        <h2 class="header-username">{{userData ? userData.name : ''}}</h2>
       </div>
       <div class="header-right d-flex">
         <PHeaderState profileState="false"/>
-        <button class="header-exit text-white" @click="logout">
-          <ion-icon name="enter-outline"></ion-icon>
+        <button class="header-exit" @click="logout" title="Çıkış Yap">
+          <ion-icon name="log-out-outline"></ion-icon>
         </button>
       </div>
     </div>
@@ -33,7 +36,6 @@ export default {
   },
 
   mounted() {
-
     const userData = localStorage.getItem('userData');
     if (userData) {
       let user = JSON.parse(userData);
@@ -43,7 +45,6 @@ export default {
 
   methods: {
     async logout() {
-      // Log out the user.
       localStorage.removeItem('token');
       localStorage.removeItem('domain');
       localStorage.removeItem('userData');
@@ -53,7 +54,6 @@ export default {
     }
   }
 };
-
 </script>
 
 <style src="./PHeader.scss" lang="scss"/>

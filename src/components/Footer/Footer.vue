@@ -1,9 +1,9 @@
 <template>
-  <footer class="footer text-center py-3 text-white">
+  <footer class="footer text-center py-3">
     <div class="container d-flex justify-content-center align-items-center gap-2 flex-wrap">
       <span>© {{ new Date().getFullYear() }} GPS Teknoloji Yazılım Şirketi</span>
       <span>|</span>
-      <a href="https://gpsteknoloji.com" target="_blank" class="text-decoration-none text-white fw-semibold">
+      <a href="https://gpsteknoloji.com" target="_blank" class="text-decoration-none fw-semibold" style="color: #6366f1">
         www.gpsteknoloji.com
       </a>
       <span>|</span>

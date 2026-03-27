@@ -1,14 +1,16 @@
 <template>
   <PHeader></PHeader>
-  <div class="container">
-    <div class="wrapper-row">
-      <div class="left rounded pt-5">
-        <PDate />
-        <PNotifications />
+  <div class="container home-container">
+    <div class="home-welcome">
+      <div class="welcome-text">
+        <p class="welcome-sub">Hoş geldiniz</p>
+        <h1 class="welcome-title">Ne yapmak istersiniz?</h1>
       </div>
-      <div class="right">
-        <PCard />
-      </div>
+      <PDate />
+    </div>
+    <PCard />
+    <div class="home-notifications">
+      <PNotifications />
     </div>
   </div>
   <PFooter></PFooter>
@@ -18,10 +20,9 @@
 import PDate from "../components/Date/Date.vue";
 import PNotifications from "../components/PNotifications/PNotifications.vue";
 import PCard from "../components/PCard/PCard.vue";
-import PWeather from "../components/PWeather/PWeather.vue";
-import { tableDetailStore } from "../store/table-detail";
 import PHeader from "../components/Header/PHeader/PHeader.vue";
 import PFooter from "../components/Footer/Footer.vue";
+import { tableDetailStore } from "../store/table-detail";
 
 tableDetailStore.isDivide = false;
 tableDetailStore.willMoveTableId = null;
@@ -30,24 +31,47 @@ tableDetailStore.selectedIndex = 0;
 </script>
 
 <style scoped lang="scss">
-.container {
+.home-container {
+  padding-top: 0.5rem;
+
   @media (max-width: 1024px) {
-    padding: 0px 40px;
+    padding: 0 24px;
   }
-  .wrapper-row {
-    display: flex;
-    width: 100%;
-    flex: 1;
-    align-items: center;
+}
 
-    .left {
-      flex: 0.3;
-      margin-right: 2vw;
-    }
+.home-welcome {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
 
-    .right {
-      flex: 0.7;
+  .welcome-sub {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 500;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .welcome-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+
+    .welcome-title {
+      font-size: 1.3rem;
     }
   }
+}
+
+.home-notifications {
+  margin-top: 2rem;
 }
 </style>

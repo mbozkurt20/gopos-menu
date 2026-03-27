@@ -1,12 +1,18 @@
 <template>
-  <button class="btn-sm btn btn-custom float-end mb-2 rounded text-white" @click="clearLocalStorage(1)">Menü Yenile</button>
+  <div class="modules-header">
+    <span class="modules-title">Modüller</span>
+    <button class="btn-refresh" @click="clearLocalStorage(1)">
+      <ion-icon name="refresh-outline"></ion-icon>
+      Menü Yenile
+    </button>
+  </div>
 
   <div class="card2">
     <div class="card-items">
       <div class="card-item" v-for="item in cards" :key="item.slug">
         <router-link :to="item.slug">
-          <div class="card-image">
-            <img :src="item.icon" alt=""/>
+          <div class="card-icon-wrap">
+            <ion-icon :name="getIcon(item.slug)"></ion-icon>
           </div>
           <div class="card-title">
             {{ item.name }}
@@ -25,6 +31,32 @@ import Pusher from "pusher-js";
 import {toast} from "vue3-toastify";
 
 const cards = ref([]);
+
+const iconMap = {
+  '/masa': 'restaurant-outline',
+  '/table': 'restaurant-outline',
+  '/online': 'globe-outline',
+  '/siparis': 'bag-handle-outline',
+  '/order': 'bag-handle-outline',
+  '/rapor': 'bar-chart-outline',
+  '/report': 'bar-chart-outline',
+  '/menu': 'fast-food-outline',
+  '/kasa': 'cash-outline',
+  '/cashier': 'cash-outline',
+  '/stok': 'cube-outline',
+  '/stock': 'cube-outline',
+  '/paket': 'bicycle-outline',
+  '/delivery': 'bicycle-outline',
+  '/musteri': 'people-outline',
+  '/customer': 'people-outline',
+  '/cari': 'wallet-outline',
+  '/ayar': 'settings-outline',
+  '/settings': 'settings-outline',
+};
+
+const getIcon = (slug) => {
+  return iconMap[slug] || 'apps-outline';
+};
 
 const clearLocalStorage = (status) => {
   localStorage.removeItem('modules');
