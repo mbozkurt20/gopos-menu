@@ -76,180 +76,74 @@ const submit = (item) => {
 
 <template>
   <!-- Products grid -->
-  <div v-if="product.length > 0" class="product-grid">
+  <div v-if="product.length > 0" class="grid gap-3 p-4" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));">
     <div
       v-for="item in product"
       :key="item.id"
-      class="product-card"
-      :class="{ 'product-card--selected': isSelected(item) }"
+      class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col cursor-pointer transition-all hover:shadow-md hover:-translate-y-0.5"
+      :class="isSelected(item) ? 'ring-2 ring-indigo-500 border-indigo-300' : ''"
       @click.stop="selectItem(item)"
     >
-      <div class="product-img-wrap">
-        <img :src="item.image" alt="Ürün" class="product-img" />
+      <div class="relative">
+        <img :src="item.image" alt="Ürün" class="w-full h-24 object-cover bg-slate-100" />
       </div>
-      <div class="product-info">
-        <div class="product-name">{{ item.name }}</div>
-        <div class="product-price">
+      <div class="p-3 flex flex-col gap-1 flex-1">
+        <div class="text-xs font-bold text-slate-800 leading-tight line-clamp-2">{{ item.name }}</div>
+        <div class="text-xs font-extrabold text-indigo-600 mt-auto">
           <span v-if="packageRoute">{{ formatPrice(item.package_price) }}</span>
           <span v-else-if="fastSell">{{ formatPrice(item.fast_price) }}</span>
           <span v-else>{{ formatPrice(item.price) }}</span>
         </div>
       </div>
-      <div v-if="isSelected(item)" class="product-actions">
-        <button class="btn-add" @click.stop="addSelectedToCart">Ekle</button>
-        <button class="btn-customize" @click.stop="openCustomizeModal(item)">Özelleştir</button>
+      <!-- Action buttons (shown when selected) -->
+      <div v-if="isSelected(item)" class="flex gap-1 px-2 pb-2">
+        <button
+          class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-colors"
+          @click.stop="addSelectedToCart"
+        >
+          Ekle
+        </button>
+        <button
+          class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-colors"
+          @click.stop="openCustomizeModal(item)"
+        >
+          Özelleştir
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Sub-categories -->
-  <div v-if="tableDetailStore.showParent" class="cat-grid">
+  <div v-if="tableDetailStore.showParent" class="grid gap-3 p-4" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
     <div
       v-for="item in tableDetailStore.categories[tableDetailStore.selectedIndex]?.children_recursive"
       :key="item.id"
       @click="submit(item)"
-      class="cat-card"
+      class="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-center text-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-colors"
+      style="height: 100px;"
     >
-      <div class="cat-name">{{ item.name }}</div>
+      <div class="text-sm font-bold text-slate-700">{{ item.name }}</div>
     </div>
   </div>
 
-  <div v-if="tableDetailStore.showSubCategory" class="cat-grid">
+  <div v-if="tableDetailStore.showSubCategory" class="grid gap-3 p-4" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
     <div
       v-for="item in tableDetailStore.subCategory"
       :key="item.id"
       @click="submit(item)"
-      class="cat-card"
+      class="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-center text-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-colors"
+      style="height: 100px;"
     >
-      <div class="cat-name">{{ item.name }}</div>
+      <div class="text-sm font-bold text-slate-700">{{ item.name }}</div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  padding: 16px;
-}
-
-.product-card {
-  background: #fff;
-  border-radius: 16px;
-  border: 1.5px solid #e2e8f0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
-}
-.product-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transform: translateY(-2px);
-}
-.product-card--selected {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-}
-
-.product-img-wrap {
-  width: 100%;
-  height: 90px;
-  overflow: hidden;
-  background: #f1f5f9;
-  flex-shrink: 0;
-}
-.product-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-.product-card:hover .product-img { transform: scale(1.05); }
-
-.product-info {
-  padding: 10px 10px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.product-name {
-  font-size: 12px;
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1.3;
+.line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.product-price {
-  font-size: 13px;
-  font-weight: 800;
-  color: #4f46e5;
-  margin-top: auto;
-}
-
-.product-actions {
-  display: flex;
-  gap: 6px;
-  padding: 0 8px 10px;
-}
-
-.btn-add, .btn-customize {
-  flex: 1;
-  padding: 6px 0;
-  border: none;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s;
-  font-family: inherit;
-}
-.btn-add { background: #10b981; color: #fff; }
-.btn-add:hover { background: #059669; }
-.btn-customize { background: #4f46e5; color: #fff; }
-.btn-customize:hover { background: #4338ca; }
-
-/* Category grid */
-.cat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-  padding: 16px;
-}
-
-.cat-card {
-  background: #fff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 16px;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
-}
-.cat-card:hover { background: #eef2ff; border-color: #c7d2fe; }
-
-.cat-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: #374151;
-  text-align: center;
-}
-
-@media (max-width: 480px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-    padding: 12px;
-  }
 }
 </style>

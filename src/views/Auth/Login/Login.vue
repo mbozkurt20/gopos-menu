@@ -2,8 +2,12 @@
   <!-- Splash screen -->
   <Transition name="splash-fade">
     <div v-if="showSplash" class="splash">
-      <div class="splash-logo">
-        <ion-icon name="restaurant-outline" style="font-size:48px; color:#fff;"></ion-icon>
+      <div class="splash-rings">
+        <div class="splash-ring splash-ring--1"></div>
+        <div class="splash-ring splash-ring--2"></div>
+        <div class="splash-logo">
+          <ion-icon name="restaurant-outline" style="font-size:48px; color:#fff;"></ion-icon>
+        </div>
       </div>
       <h1 class="splash-name">{{ restaurantName || 'GoAdisyon' }}</h1>
       <p class="splash-sub">Dijital Menü</p>
@@ -110,24 +114,60 @@ onMounted(async () => {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 60%, #818cf8 100%);
+  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 50%, #6366f1 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
   padding: 24px;
 }
 
-.splash-logo {
-  width: 72px;
-  height: 72px;
-  background: rgba(255,255,255,0.18);
-  border-radius: 22px;
+.splash-rings {
+  position: relative;
+  width: 100px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.splash-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  animation: ring-pulse 2s ease-out infinite;
+}
+.splash-ring--1 {
+  width: 88px;
+  height: 88px;
+  animation-delay: 0s;
+}
+.splash-ring--2 {
+  width: 72px;
+  height: 72px;
+  animation-delay: 0.4s;
+}
+
+@keyframes ring-pulse {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  50% { transform: scale(1.08); opacity: 0.2; }
+  100% { transform: scale(0.85); opacity: 0.7; }
+}
+
+.splash-logo {
+  width: 64px;
+  height: 64px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
 }
 
 .splash-name {
@@ -136,18 +176,21 @@ onMounted(async () => {
   color: #fff;
   margin: 0;
   text-align: center;
+  letter-spacing: -0.5px;
 }
 
 .splash-sub {
   font-size: 13px;
-  color: rgba(255,255,255,0.7);
-  margin: 0 0 20px;
+  color: rgba(255,255,255,0.65);
+  margin: 0 0 8px;
   font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .splash-bar {
   width: min(160px, 60vw);
-  height: 4px;
+  height: 3px;
   background: rgba(255,255,255,0.2);
   border-radius: 999px;
   overflow: hidden;
@@ -155,9 +198,10 @@ onMounted(async () => {
 
 .splash-bar-fill {
   height: 100%;
-  background: #fff;
+  background: rgba(255,255,255,0.9);
   border-radius: 999px;
   transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
 }
 
 /* ── Welcome ─────────────────────────────────── */

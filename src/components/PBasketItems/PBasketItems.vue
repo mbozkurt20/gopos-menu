@@ -1,12 +1,15 @@
 <template>
-  <div class="basket-sidebar">
+  <div
+    class="bg-white flex flex-col rounded-l-xl"
+    style="width:30%"
+  >
     <!-- Top Title -->
-    <div class="basket-top">
-      <span class="basket-title">{{ title }}</span>
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+      <span class="text-indigo-600 text-base font-bold uppercase tracking-wide">{{ title }}</span>
       <div
         v-if="type === 'packages'"
         @click="setCustomerListModal(true)"
-        class="basket-customer"
+        class="flex items-center gap-1.5 text-indigo-600 text-xs font-semibold cursor-pointer hover:text-indigo-700 transition-colors"
       >
         <ion-icon name="person-add" style="font-size:16px;"></ion-icon>
         {{ getCustomer }}
@@ -14,8 +17,8 @@
     </div>
 
     <!-- Product List -->
-    <div class="basket-list">
-      <div class="basket-list-inner">
+    <div class="flex-1 overflow-y-auto no-scrollbar px-3 py-2" style="max-height:calc(100vh - 220px)">
+      <div class="flex flex-col gap-2">
         <PBasketItem
           v-for="item in productItems"
           :key="item.id"
@@ -24,16 +27,17 @@
           v-if="productItems.length"
           :isBillingPage="isBillingPage"
         />
-        <p v-else class="basket-empty">Adisyon'da Sipariş Bulunmuyor...</p>
+        <p v-else class="text-slate-400 text-center text-sm mt-6">Adisyon'da Sipariş Bulunmuyor...</p>
       </div>
     </div>
 
     <!-- Actions -->
-    <div class="basket-actions">
+    <div class="border-t border-slate-100 px-3 py-3 bg-white flex flex-col gap-2">
+
       <!-- Toplam -->
-      <div class="basket-total-row">
-        <span class="basket-total-label">Toplam</span>
-        <span class="basket-total-price">{{ formatPrice(calculateTotalPrice) }}</span>
+      <div class="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-xl">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Toplam</span>
+        <span class="text-indigo-600 text-base font-extrabold">{{ formatPrice(calculateTotalPrice) }}</span>
       </div>
 
       <!-- Yeni adisyon: KAYDET (status 0 veya 2) -->
@@ -41,10 +45,12 @@
         v-if="tableDetailStore.table.status === 0 || tableDetailStore.table.status === 2"
         @click="onSave()"
         :disabled="!productItems.length"
-        class="basket-btn"
-        :class="productItems.length ? 'basket-btn--save' : 'basket-btn--disabled'"
+        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-0 font-bold text-sm transition-all"
+        :class="productItems.length
+          ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 active:scale-95'
+          : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
       >
-        <ion-icon name="checkmark-circle-outline" style="font-size:17px;"></ion-icon>
+        <ion-icon name="checkmark-circle-outline" style="font-size:18px;"></ion-icon>
         ADİSYONU KAYDET
       </button>
 
@@ -53,10 +59,12 @@
         v-if="tableDetailStore.table.status === 1 || tableDetailStore.table.status === 3"
         @click="updateProductTables()"
         :disabled="!productItems.length"
-        class="basket-btn"
-        :class="productItems.length ? 'basket-btn--update' : 'basket-btn--disabled'"
+        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-0 font-bold text-sm transition-all"
+        :class="productItems.length
+          ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm shadow-amber-200 active:scale-95'
+          : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
       >
-        <ion-icon name="cloud-upload-outline" style="font-size:17px;"></ion-icon>
+        <ion-icon name="cloud-upload-outline" style="font-size:18px;"></ion-icon>
         ADİSYONU GÜNCELLE
       </button>
 
@@ -65,10 +73,12 @@
         v-if="tableDetailStore.table.isFastSell !== undefined"
         :disabled="!getIsAvailableFastSellButton"
         @click="onFastSell()"
-        class="basket-btn"
-        :class="getIsAvailableFastSellButton ? 'basket-btn--save' : 'basket-btn--disabled'"
+        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-0 font-bold text-sm transition-all"
+        :class="getIsAvailableFastSellButton
+          ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 active:scale-95'
+          : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
       >
-        <ion-icon name="checkmark-circle-outline" style="font-size:17px;"></ion-icon>
+        <ion-icon name="checkmark-circle-outline" style="font-size:18px;"></ion-icon>
         SİPARİŞLERİ KAYDET
       </button>
 
@@ -77,12 +87,15 @@
         v-if="tableDetailStore.table.isPackages !== undefined"
         :disabled="!getIsAvailableFastSellButton"
         @click="onPackages()"
-        class="basket-btn"
-        :class="getIsAvailableFastSellButton ? 'basket-btn--save' : 'basket-btn--disabled'"
+        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-0 font-bold text-sm transition-all"
+        :class="getIsAvailableFastSellButton
+          ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 active:scale-95'
+          : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
       >
-        <ion-icon name="checkmark-circle-outline" style="font-size:17px;"></ion-icon>
+        <ion-icon name="checkmark-circle-outline" style="font-size:18px;"></ion-icon>
         ADİSYONU KAYDET
       </button>
+
     </div>
   </div>
 </template>
@@ -135,133 +148,3 @@ const onPackages = () => {
   }
 };
 </script>
-
-<style scoped>
-.basket-sidebar {
-  background: #fff;
-  width: 30%;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  border-top-left-radius: 16px;
-  border-bottom-left-radius: 16px;
-  overflow: hidden;
-}
-
-@media (max-width: 992px) {
-  .basket-sidebar {
-    width: 100%;
-    border-radius: 12px;
-  }
-}
-
-.basket-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid #f1f5f9;
-  flex-shrink: 0;
-}
-
-.basket-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #4f46e5;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.basket-customer {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #4f46e5;
-  cursor: pointer;
-  transition: color 0.12s;
-}
-.basket-customer:hover { color: #4338ca; }
-
-.basket-list {
-  flex: 1;
-  overflow-y: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  max-height: calc(100vh - 220px);
-}
-.basket-list::-webkit-scrollbar { display: none; }
-
-.basket-list-inner {
-  display: flex;
-  flex-direction: column;
-}
-
-.basket-empty {
-  color: #94a3b8;
-  text-align: center;
-  font-size: 13px;
-  padding: 24px 16px;
-  margin: 0;
-}
-
-.basket-actions {
-  border-top: 1px solid #f1f5f9;
-  padding: 12px;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.basket-total-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 10px 14px;
-}
-
-.basket-total-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.basket-total-price {
-  font-size: 16px;
-  font-weight: 800;
-  color: #4f46e5;
-}
-
-.basket-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.15s, transform 0.1s;
-  letter-spacing: 0.3px;
-}
-.basket-btn:active { transform: scale(0.98); }
-
-.basket-btn--save { background: #4f46e5; color: #fff; }
-.basket-btn--save:hover { background: #4338ca; }
-
-.basket-btn--update { background: #f59e0b; color: #fff; }
-.basket-btn--update:hover { background: #d97706; }
-
-.basket-btn--disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
-</style>
