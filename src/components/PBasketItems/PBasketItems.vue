@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="bg-white flex flex-col rounded-l-xl"
-    style="width:30%"
-  >
+  <div class="bg-white flex flex-col w-full h-full overflow-hidden">
     <!-- Top Title -->
     <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
       <span class="text-indigo-600 text-base font-bold uppercase tracking-wide">{{ title }}</span>

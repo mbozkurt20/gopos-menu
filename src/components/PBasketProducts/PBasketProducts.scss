@@ -1,5 +1,5 @@
 .content {
-  background: #ebe7f0;
+  background: #f1f5f9;
   padding: 18px;
   width: 65%;
 
@@ -93,7 +93,7 @@
   }
 
   &-active{
-    background: rgb(238, 21, 79);
+    background: #4f46e5;
 
     .basket-item{
       &-title{
@@ -101,13 +101,13 @@
       }
 
       &-state{
-        color: #ffffffc5;
+        color: rgba(255,255,255,0.75);
       }
     }
   }
 
   &-processing{
-    background: rgb(30, 70, 131);
+    background: #059669;
 
     .basket-item{
       &-title{
@@ -117,7 +117,7 @@
   }
 
   &-revise{
-    background: #dca266;
+    background: #f59e0b;
 
     .basket-item{
       &-title{
@@ -125,13 +125,13 @@
       }
 
       &-state{
-        color: #ffffffc5;
+        color: rgba(255,255,255,0.75);
       }
     }
   }
 
   &-printed{
-    background: rgb(66 93 229);
+    background: #4f46e5;
 
     .basket-item{
       &-title{
@@ -139,7 +139,7 @@
       }
 
       &-state{
-        color: #ffffffc5;
+        color: rgba(255,255,255,0.75);
       }
     }
   }
