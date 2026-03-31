@@ -68,9 +68,9 @@ onMounted(async () => {
   const restaurantCode = segments[2];
   table.value = segments[4] ?? null;
 
-  // Progress bar animation (5 seconds)
+  // Progress bar animation (1.5 seconds)
   const startTime = Date.now();
-  const SPLASH_DURATION = 5000;
+  const SPLASH_DURATION = 1500;
   const tick = () => {
     const elapsed = Date.now() - startTime;
     splashProgress.value = Math.min((elapsed / SPLASH_DURATION) * 100, 100);
@@ -104,8 +104,8 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped lang="scss">
-/* Splash */
+<style scoped>
+/* ── Splash ─────────────────────────────────── */
 .splash {
   position: fixed;
   inset: 0;
@@ -116,37 +116,37 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 12px;
+  padding: 24px;
 }
 
 .splash-logo {
-  width: 80px;
-  height: 80px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 24px;
+  width: 72px;
+  height: 72px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .splash-name {
-  font-size: 28px;
+  font-size: clamp(22px, 6vw, 30px);
   font-weight: 800;
   color: #fff;
   margin: 0;
   text-align: center;
-  padding: 0 24px;
 }
 
 .splash-sub {
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(255,255,255,0.7);
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   font-weight: 500;
 }
 
 .splash-bar {
-  width: 160px;
+  width: min(160px, 60vw);
   height: 4px;
   background: rgba(255,255,255,0.2);
   border-radius: 999px;
@@ -160,24 +160,25 @@ onMounted(async () => {
   transition: width 0.1s linear;
 }
 
-/* Welcome */
+/* ── Welcome ─────────────────────────────────── */
 .welcome-root {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8fafc;
-  padding: 24px;
+  background: #f1f5f9;
+  padding: 16px;
 }
 
 .welcome-card {
   background: #fff;
   border-radius: 24px;
   border: 1px solid #e0e7ff;
-  box-shadow: 0 8px 32px rgba(79, 70, 229, 0.08);
-  padding: 36px 28px 28px;
-  max-width: 380px;
+  box-shadow: 0 8px 32px rgba(79,70,229,0.08);
+  padding: 32px 24px 24px;
   width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -185,18 +186,19 @@ onMounted(async () => {
 }
 
 .welcome-icon {
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   background: #eef2ff;
-  border-radius: 20px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
 .welcome-title {
-  font-size: 22px;
+  font-size: clamp(18px, 5vw, 22px);
   font-weight: 800;
   color: #1e293b;
   margin: 0 0 6px;
@@ -205,15 +207,15 @@ onMounted(async () => {
 .welcome-sub {
   font-size: 14px;
   color: #64748b;
-  margin: 0 0 28px;
+  margin: 0 0 24px;
 }
 
 .welcome-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .btn-menu {
@@ -231,9 +233,10 @@ onMounted(async () => {
   gap: 10px;
   cursor: pointer;
   transition: background 0.15s;
-
-  &:hover { background: #4338ca; }
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+.btn-menu:hover, .btn-menu:active { background: #4338ca; }
 
 .btn-order {
   width: 100%;
@@ -250,9 +253,10 @@ onMounted(async () => {
   gap: 10px;
   cursor: pointer;
   transition: all 0.15s;
-
-  &:hover { background: #eef2ff; border-color: #a5b4fc; }
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+.btn-order:hover, .btn-order:active { background: #eef2ff; border-color: #a5b4fc; }
 
 .welcome-footer {
   font-size: 11px;
@@ -261,20 +265,13 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
 }
 
-/* Transitions */
-.splash-fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.splash-fade-leave-to {
-  opacity: 0;
-}
+/* ── Transitions ─────────────────────────────── */
+.splash-fade-leave-active { transition: opacity 0.4s ease; }
+.splash-fade-leave-to { opacity: 0; }
 
-.fade-enter-active {
-  transition: opacity 0.4s ease 0.2s;
-}
-.fade-enter-from {
-  opacity: 0;
-}
+.fade-enter-active { transition: opacity 0.35s ease 0.1s; }
+.fade-enter-from { opacity: 0; }
 </style>
