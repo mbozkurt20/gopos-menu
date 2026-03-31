@@ -256,9 +256,10 @@ const goOrder = () => router.push({ path: `/tables/${table}` });
   &:hover { background: #f8fafc; }
 
   &--active {
-    background: #4f46e5;
-    color: #fff;
-    border-color: #4f46e5;
+    background: #eef2ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+    font-weight: 700;
   }
 }
 

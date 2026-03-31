@@ -26,7 +26,6 @@ const selectItem = (item) => {
 const addSelectedToCart = () => {
   if (!selectedItem.value) return;
   const item = { ...selectedItem.value };
-
   if (packageRoute.value) item.price = item.package_price;
   else if (fastSell.value) item.price = item.fast_price;
 
@@ -39,7 +38,6 @@ const addSelectedToCart = () => {
     updated_at: new Date().toString(),
     portion: 1,
   });
-
   selectedItem.value = null;
 };
 
@@ -49,7 +47,6 @@ const openCustomizeModal = (item) => {
   setFeatureListModal(true);
 };
 
-// Dış tıklamada kart seçimini temizle
 const handleClickOutside = (event: MouseEvent) => {
   const cards = document.querySelectorAll(".product-card");
   let clickedInside = false;
@@ -59,13 +56,8 @@ const handleClickOutside = (event: MouseEvent) => {
   if (!clickedInside) selectedItem.value = null;
 };
 
-onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener("click", handleClickOutside);
-});
+onMounted(() => document.addEventListener("click", handleClickOutside));
+onBeforeUnmount(() => document.removeEventListener("click", handleClickOutside));
 
 const submit = (item) => {
   setSelectedCategory({ id: item.id, label: item.name, url: "/" });
@@ -81,191 +73,183 @@ const submit = (item) => {
   }
 };
 </script>
-<template>
-  <div class="product-grid" v-if="product.length > 0">
-    <div
-        class="product-card"
-        v-for="item in product"
-        :key="item.id"
-        @click.stop="selectItem(item)"
-        :class="{ selected: isSelected(item) }"
-    >
-      <!-- Sol: Görsel -->
-      <div class="product-image-container">
-        <img :src="item.image" alt="Ürün" class="product-image" />
-      </div>
 
-      <!-- Sağ: Bilgiler -->
-      <div class="product-details">
+<template>
+  <!-- Products grid -->
+  <div v-if="product.length > 0" class="product-grid">
+    <div
+      v-for="item in product"
+      :key="item.id"
+      class="product-card"
+      :class="{ 'product-card--selected': isSelected(item) }"
+      @click.stop="selectItem(item)"
+    >
+      <div class="product-img-wrap">
+        <img :src="item.image" alt="Ürün" class="product-img" />
+      </div>
+      <div class="product-info">
         <div class="product-name">{{ item.name }}</div>
         <div class="product-price">
           <span v-if="packageRoute">{{ formatPrice(item.package_price) }}</span>
           <span v-else-if="fastSell">{{ formatPrice(item.fast_price) }}</span>
           <span v-else>{{ formatPrice(item.price) }}</span>
         </div>
-
-        <div v-if="isSelected(item)" class="action-buttons">
-          <button class="add-button" @click.stop="addSelectedToCart">Ekle</button>
-          <button class="customize-button" @click.stop="openCustomizeModal(item)">
-            Özelleştir
-          </button>
-        </div>
       </div>
+      <div v-if="isSelected(item)" class="product-actions">
+        <button class="btn-add" @click.stop="addSelectedToCart">Ekle</button>
+        <button class="btn-customize" @click.stop="openCustomizeModal(item)">Özelleştir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-categories -->
+  <div v-if="tableDetailStore.showParent" class="cat-grid">
+    <div
+      v-for="item in tableDetailStore.categories[tableDetailStore.selectedIndex]?.children_recursive"
+      :key="item.id"
+      @click="submit(item)"
+      class="cat-card"
+    >
+      <div class="cat-name">{{ item.name }}</div>
+    </div>
+  </div>
+
+  <div v-if="tableDetailStore.showSubCategory" class="cat-grid">
+    <div
+      v-for="item in tableDetailStore.subCategory"
+      :key="item.id"
+      @click="submit(item)"
+      class="cat-card"
+    >
+      <div class="cat-name">{{ item.name }}</div>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
-/* Grid düzeni */
+<style scoped>
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
   padding: 16px;
 }
 
-/* Kart görünümü */
 .product-card {
-  display: flex;
-  align-items: center;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  border: 1.5px solid #e2e8f0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
-  transition: all 0.25s ease;
-  min-height: 120px;
-  padding: 8px;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
-  }
-
-  &.selected {
-    border: 2px solid #e7004d;
-  }
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+}
+.product-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+.product-card--selected {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
 }
 
-/* Görsel alanı */
-.product-image-container {
-  flex: 0 0 90px; /* Görsel genişliği */
+.product-img-wrap {
+  width: 100%;
   height: 90px;
-  border-radius: 8px;
   overflow: hidden;
-  background-color: #f8f8f8;
+  background: #f1f5f9;
+  flex-shrink: 0;
 }
-
-.product-image {
+.product-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s;
 }
+.product-card:hover .product-img { transform: scale(1.05); }
 
-.product-card:hover .product-image {
-  transform: scale(1.05);
-}
-
-/* Sağ taraf */
-.product-details {
-  flex: 1;
-  padding: 8px 12px;
+.product-info {
+  padding: 10px 10px 8px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  text-align: left;
+  gap: 4px;
+  flex: 1;
 }
 
 .product-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .product-price {
-  font-size: 14px;
-  font-weight: 500;
-  color: #e7004d;
-  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #4f46e5;
+  margin-top: auto;
 }
 
-.action-buttons {
+.product-actions {
   display: flex;
   gap: 6px;
-  margin-top: 4px;
+  padding: 0 8px 10px;
 }
 
-.add-button,
-.customize-button {
+.btn-add, .btn-customize {
   flex: 1;
-  padding: 5px 0;
+  padding: 6px 0;
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.btn-add { background: #10b981; color: #fff; }
+.btn-add:hover { background: #059669; }
+.btn-customize { background: #4f46e5; color: #fff; }
+.btn-customize:hover { background: #4338ca; }
+
+/* Category grid */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  padding: 16px;
 }
 
-.add-button {
-  background-color: #30d760;
-  color: #fff;
-  &:hover {
-    background-color: #28c156;
-  }
+.cat-card {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
 }
+.cat-card:hover { background: #eef2ff; border-color: #c7d2fe; }
 
-.customize-button {
-  background-color: #e7004d;
-  color: #fff;
-  &:hover {
-    background-color: #c90044;
-  }
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-  .product-card {
-    min-height: 110px;
-  }
-  .product-image-container {
-    flex: 0 0 80px;
-    height: 80px;
-  }
+.cat-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
   .product-grid {
-    grid-template-columns: 1fr;
-  }
-  .product-card {
-    flex-direction: row;
-    width: 100%;
-  }
-  .product-image-container {
-    flex: 0 0 70px;
-    height: 70px;
-  }
-  .product-details {
-    padding: 6px 10px;
-  }
-  .product-name {
-    font-size: 14px;
-  }
-  .product-price {
-    font-size: 13px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    padding: 12px;
   }
 }
 </style>

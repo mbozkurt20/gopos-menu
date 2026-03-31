@@ -1,151 +1,267 @@
 <template>
-  <div class="basket-items">
-    <!-- Üst Başlık -->
-    <div class="basket-items-top">
-      <div class="basket-items-top-title">
-        {{ title }}
-      </div>
+  <div class="basket-sidebar">
+    <!-- Top Title -->
+    <div class="basket-top">
+      <span class="basket-title">{{ title }}</span>
       <div
-          @click="setCustomerListModal(true)"
-          class="basket-items-order-person"
-          v-if="type === 'packages'"
+        v-if="type === 'packages'"
+        @click="setCustomerListModal(true)"
+        class="basket-customer"
       >
-        <ion-icon name="person-add" style="font-size: 17px" />
+        <ion-icon name="person-add" style="font-size:16px;"></ion-icon>
         {{ getCustomer }}
       </div>
     </div>
 
-    <!-- Ürün Listesi -->
-    <div class="basket-items-content">
-      <div class="basket-items-row">
+    <!-- Product List -->
+    <div class="basket-list">
+      <div class="basket-list-inner">
         <PBasketItem
-            v-for="item in productItems"
-            :key="item.id"
-            :item="item"
-            :type="type"
-            v-if="productItems.length"
-            :isBillingPage="isBillingPage"
+          v-for="item in productItems"
+          :key="item.id"
+          :item="item"
+          :type="type"
+          v-if="productItems.length"
+          :isBillingPage="isBillingPage"
         />
-
-        <p style="color: lightslategray;text-align: center;margin-top: 25px" v-else>Adisyon'da Sipariş Bulunmuyor...</p>
+        <p v-else class="basket-empty">Adisyon'da Sipariş Bulunmuyor...</p>
       </div>
     </div>
 
-    <!-- Alt Kısım -->
-    <div class="order-actions">
-      <div class="order-actions__left">
-        <button
-            @click="onSave()"
-            class="btn btn--primary"
-            v-if="(tableDetailStore.table.status === 0 || tableDetailStore.table.status === 2) && productItems.length"
-        >
-          SİPARİŞLERİMİ KAYDET
-        </button>
-
-        <button
-            @click="updateProductTables()"
-            class="btn btn--primary"
-            v-if="tableDetailStore.table.status === 1 || tableDetailStore.table.status === 3"
-        >
-          SİPARİŞLERİMİ GÜNCELLE
-        </button>
+    <!-- Actions -->
+    <div class="basket-actions">
+      <!-- Toplam -->
+      <div class="basket-total-row">
+        <span class="basket-total-label">Toplam</span>
+        <span class="basket-total-price">{{ formatPrice(calculateTotalPrice) }}</span>
       </div>
 
-      <div class="order-actions__totals">
-        <div class="total-box">
-          TOPLAM <br> {{ formatPrice(calculateTotalPrice) }}
-        </div>
-      </div>
+      <!-- Yeni adisyon: KAYDET (status 0 veya 2) -->
+      <button
+        v-if="tableDetailStore.table.status === 0 || tableDetailStore.table.status === 2"
+        @click="onSave()"
+        :disabled="!productItems.length"
+        class="basket-btn"
+        :class="productItems.length ? 'basket-btn--save' : 'basket-btn--disabled'"
+      >
+        <ion-icon name="checkmark-circle-outline" style="font-size:17px;"></ion-icon>
+        ADİSYONU KAYDET
+      </button>
+
+      <!-- Mevcut adisyon: GÜNCELLE (status 1 veya 3) -->
+      <button
+        v-if="tableDetailStore.table.status === 1 || tableDetailStore.table.status === 3"
+        @click="updateProductTables()"
+        :disabled="!productItems.length"
+        class="basket-btn"
+        :class="productItems.length ? 'basket-btn--update' : 'basket-btn--disabled'"
+      >
+        <ion-icon name="cloud-upload-outline" style="font-size:17px;"></ion-icon>
+        ADİSYONU GÜNCELLE
+      </button>
+
+      <!-- Gel-al -->
+      <button
+        v-if="tableDetailStore.table.isFastSell !== undefined"
+        :disabled="!getIsAvailableFastSellButton"
+        @click="onFastSell()"
+        class="basket-btn"
+        :class="getIsAvailableFastSellButton ? 'basket-btn--save' : 'basket-btn--disabled'"
+      >
+        <ion-icon name="checkmark-circle-outline" style="font-size:17px;"></ion-icon>
+        SİPARİŞLERİ KAYDET
+      </button>
+
+      <!-- Paket -->
+      <button
+        v-if="tableDetailStore.table.isPackages !== undefined"
+        :disabled="!getIsAvailableFastSellButton"
+        @click="onPackages()"
+        class="basket-btn"
+        :class="getIsAvailableFastSellButton ? 'basket-btn--save' : 'basket-btn--disabled'"
+      >
+        <ion-icon name="checkmark-circle-outline" style="font-size:17px;"></ion-icon>
+        ADİSYONU KAYDET
+      </button>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
-import calculateTime from "../../utils/calculateTime";
 import formatPrice from "../../utils/formatPrice";
 import {
   addProductToTable,
   tableDetailStore,
   calculatePayedTotal,
   getCartTotal,
-  sendPackages,
   itemAbsolutePrice,
   updateProductTables,
 } from "../../store/table-detail";
 import { setPaymentMethodModal, setCustomerListModal } from "../../store/modal";
 import PBasketItem from "./PBasketItem.vue";
-import PayedBasketItem from "./PayedBasketItem.vue";
-import axios from "axios";
 import router from "../../router";
-import { device } from "../../main";
 import { useRoute } from "vue-router";
 
 const props = defineProps(["type", "productItems", "title"]);
-
 const route = useRoute();
 
 const getCustomer = computed(() => {
-  if (tableDetailStore.customer === null) {
-    return "Müşteri Seç";
-  } else {
-    return tableDetailStore.customer.name;
-  }
+  return tableDetailStore.customer === null ? "Müşteri Seç" : tableDetailStore.customer.name;
 });
 
-const isBillingPage = computed(() => {
-  return router.currentRoute.value.fullPath.includes("bill");
-});
+const isBillingPage = computed(() => router.currentRoute.value.fullPath.includes("bill"));
 
-const payedTotal = computed(() => {
-  return calculatePayedTotal();
-});
+const payedTotal = computed(() => calculatePayedTotal());
 
 const calculateTotalPrice = computed(() => {
-  if (isBillingPage.value) {
-    return getCartTotal() - payedTotal.value;
-  } else {
-    let total = props.productItems.reduce((total, item) => {
-      const tableRoute = route.fullPath.split("/")[1] == "tables";
-      if (tableRoute) {
-        return route.params.id
-            ? total + itemAbsolutePrice(item)
-            : total + Number(item.amount);
-      } else {
-        return route.params.id
-            ? total + itemAbsolutePrice(item)
-            : total + itemAbsolutePrice(item);
-      }
-    }, 0);
-    return total;
-  }
+  if (isBillingPage.value) return getCartTotal() - payedTotal.value;
+  return props.productItems.reduce((total, item) => {
+    const tableRoute = route.fullPath.split("/")[1] == "tables";
+    return tableRoute
+      ? (route.params.id ? total + itemAbsolutePrice(item) : total + Number(item.amount))
+      : total + itemAbsolutePrice(item);
+  }, 0);
 });
 
 const getIsAvailableFastSellButton = computed(() => getCartTotal() > 0);
 
-const onSave = () => {
-  addProductToTable();
-};
-const onFastSell = () => {
-  if (getIsAvailableFastSellButton.value) {
-    setPaymentMethodModal(true);
-  }
-};
+const onSave = () => addProductToTable();
+const onFastSell = () => { if (getIsAvailableFastSellButton.value) setPaymentMethodModal(true); };
 const onPackages = () => {
   if (getIsAvailableFastSellButton.value) {
-    if (tableDetailStore.customer === null) {
-      setCustomerListModal(true);
-    } else {
-      setPaymentMethodModal(true);
-    }
+    if (tableDetailStore.customer === null) setCustomerListModal(true);
+    else setPaymentMethodModal(true);
   }
-};
-
-const takePayment = () => {
-  router.push(`/tables/${tableDetailStore.table.id}/bill`);
 };
 </script>
 
+<style scoped>
+.basket-sidebar {
+  background: #fff;
+  width: 30%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+  overflow: hidden;
+}
 
-<style src="./PBasketItems.scss" lang="scss" scoped />
+@media (max-width: 992px) {
+  .basket-sidebar {
+    width: 100%;
+    border-radius: 12px;
+  }
+}
+
+.basket-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.basket-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4f46e5;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.basket-customer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4f46e5;
+  cursor: pointer;
+  transition: color 0.12s;
+}
+.basket-customer:hover { color: #4338ca; }
+
+.basket-list {
+  flex: 1;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  max-height: calc(100vh - 220px);
+}
+.basket-list::-webkit-scrollbar { display: none; }
+
+.basket-list-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.basket-empty {
+  color: #94a3b8;
+  text-align: center;
+  font-size: 13px;
+  padding: 24px 16px;
+  margin: 0;
+}
+
+.basket-actions {
+  border-top: 1px solid #f1f5f9;
+  padding: 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.basket-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.basket-total-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.basket-total-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #4f46e5;
+}
+
+.basket-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.3px;
+}
+.basket-btn:active { transform: scale(0.98); }
+
+.basket-btn--save { background: #4f46e5; color: #fff; }
+.basket-btn--save:hover { background: #4338ca; }
+
+.basket-btn--update { background: #f59e0b; color: #fff; }
+.basket-btn--update:hover { background: #d97706; }
+
+.basket-btn--disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+</style>

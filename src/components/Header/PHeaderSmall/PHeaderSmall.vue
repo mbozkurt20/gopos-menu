@@ -1,41 +1,43 @@
 <template>
-    <header class="header">
-        <div class="header-row">
-            <div class="header-left d-flex">
-                <div v-if="user && user.type != 3" role="button" class="btn btn-icon btn-sm rounded shadow text-white"
-                     style="background-color: #e3406f;" @click="backButton">
-                    <ion-icon style="font-size: 22px;top:2.5px;position:relative;" name="arrow-back-outline"></ion-icon>
-                </div>
-                <div class="header-logo">
-                  <h4 class="text-white mt-2">{{userData ? userData.name : ''}} Menü</h4>
-                </div>
-            </div>
-            <div class="header-right d-flex">
-                <PHeaderState profileState="false" />
-              <svg xmlns="http://www.w3.org/2000/svg" class="ionicon"
-                   viewBox="0 0 512 512">
-                <path
-                    d="M320 176v-40a40 40 0 00-40-40H88a40 40 0 00-40 40v240a40 40 0 0040 40h192a40 40 0 0040-40v-40M384 176l80 80-80 80M191 256h273"
-                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="32" />
-              </svg>
-            </div>
-        </div>
-    </header>
+  <header style="background:#4f46e5; box-shadow:0 1px 4px rgba(79,70,229,0.2);">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 16px; gap:16px;">
+
+      <!-- Left: Back + Logo -->
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button
+          v-if="user && user.type != 3"
+          @click="backButton"
+          style="width:36px; height:36px; background:#ec4899; border:none; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:background 0.15s;"
+          onmouseover="this.style.background='#db2777'"
+          onmouseout="this.style.background='#ec4899'"
+        >
+          <ion-icon name="arrow-back-outline" style="font-size:20px; color:#fff;"></ion-icon>
+        </button>
+        <router-link to="/tables" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+          <div style="width:28px; height:28px; background:rgba(255,255,255,0.2); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <ion-icon name="restaurant-outline" style="font-size:14px; color:#fff;"></ion-icon>
+          </div>
+          <span style="color:#fff; font-weight:800; font-size:15px; letter-spacing:-0.3px;">
+            {{ userData ? userData.name : '' }}
+          </span>
+        </router-link>
+      </div>
+
+      <!-- Right: State -->
+      <div style="display:flex; align-items:center; gap:12px;">
+        <PHeaderState profileState="false" />
+      </div>
+
+    </div>
+  </header>
 </template>
 
 <script setup lang="ts">
 import PHeaderState from "../PHeaderState/PHeaderState.vue"
-import { device } from "../../../main";
 import { useRouter } from 'vue-router';
 
-const table = localStorage.getItem('table');
 const router = useRouter();
-const user = localStorage.user ? JSON.parse(localStorage.getItem('user')) : null
-const userData =  JSON.parse(localStorage.getItem('userData'))
-const backButton = () => {
-  router.back();
-}
+const user = localStorage.user ? JSON.parse(localStorage.getItem('user')) : null;
+const userData = JSON.parse(localStorage.getItem('userData'));
+const backButton = () => { router.back(); };
 </script>
-
-<style src="./PHeaderSmall.scss" lang="scss" scoped/>
