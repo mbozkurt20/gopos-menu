@@ -86,8 +86,8 @@
       </div>
 
       <!-- Table cards grid -->
-      <div class="flex-1 overflow-y-auto no-scrollbar p-4">
-        <div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));">
+      <div class="flex-1 overflow-y-auto no-scrollbar p-3 lg:p-4 pb-20 lg:pb-4">
+        <div class="grid gap-2 lg:gap-3" style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));">
           <PBasketProductItem
             v-for="item in products"
             :key="item.id"

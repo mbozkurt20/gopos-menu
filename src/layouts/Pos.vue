@@ -317,7 +317,7 @@ onMounted(() => {
   font-family: inherit;
 }
 .mobile-cat-tab:hover { border-color: #a5b4fc; color: #4f46e5; }
-.mobile-cat-tab--active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+.mobile-cat-tab--active { background: #4f46e5 !important; color: #fff !important; border-color: #4f46e5 !important; }
 
 /* ── Product slot ── */
 .product-slot {
