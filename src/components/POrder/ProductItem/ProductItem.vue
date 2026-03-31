@@ -98,13 +98,13 @@ const submit = (item) => {
       <!-- Action buttons (shown when selected) -->
       <div v-if="isSelected(item)" class="flex gap-1 px-2 pb-2">
         <button
-          class="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-colors"
+          class="flex-1 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md text-[10px] font-bold transition-colors"
           @click.stop="addSelectedToCart"
         >
           Ekle
         </button>
         <button
-          class="flex-1 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-colors"
+          class="flex-1 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-[10px] font-bold transition-colors"
           @click.stop="openCustomizeModal(item)"
         >
           Özelleştir

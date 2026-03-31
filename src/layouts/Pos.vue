@@ -241,7 +241,7 @@ onMounted(() => {
   line-height: 1.3;
 }
 .cat-item:hover { background: rgba(255,255,255,0.12); }
-.cat-item--active { background: #fff; color: #4338ca; font-weight: 700; }
+.cat-item--active { background: rgba(255,255,255,0.22); color: #fff; font-weight: 700; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.35); }
 
 /* ── Desktop Cart ── */
 .cart-desktop {
