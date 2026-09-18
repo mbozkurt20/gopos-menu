@@ -162,7 +162,7 @@ const selectCategory = (id) => {
     <!-- Footer -->
     <div class="text-center py-4 text-xs text-slate-300 font-semibold pb-24">
       <ion-icon name="shield-checkmark-outline" style="font-size:11px; margin-right:3px;"></ion-icon>
-      GoAdisyon · Dijital Menü
+      Posis · Dijital Menü
     </div>
 
   </div>

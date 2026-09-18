@@ -9,7 +9,7 @@
           <ion-icon name="restaurant-outline" style="font-size:48px; color:#fff;"></ion-icon>
         </div>
       </div>
-      <h1 class="splash-name">{{ restaurantName || 'GoAdisyon' }}</h1>
+      <h1 class="splash-name">{{ restaurantName || 'Posis' }}</h1>
       <p class="splash-sub">Dijital Menü</p>
       <div class="splash-bar">
         <div class="splash-bar-fill" :style="{ width: splashProgress + '%' }"></div>
@@ -41,7 +41,7 @@
 
         <p class="welcome-footer">
           <ion-icon name="shield-checkmark-outline" style="font-size:12px; margin-right:4px;"></ion-icon>
-          GoAdisyon tarafından güvence altındadır
+          Posis tarafından güvence altındadır
         </p>
       </div>
     </div>

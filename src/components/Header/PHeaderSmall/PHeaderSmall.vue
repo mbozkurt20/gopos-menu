@@ -18,7 +18,7 @@
             <ion-icon name="restaurant-outline" style="font-size:13px; color:#fff;"></ion-icon>
           </div>
           <span style="color:#fff; font-weight:800; font-size:14px; letter-spacing:-0.3px;">
-            {{ userData ? userData.name : 'GoAdisyon' }}
+            {{ userData ? userData.name : 'Posis' }}
           </span>
         </router-link>
       </div>
