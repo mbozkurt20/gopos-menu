@@ -86,7 +86,7 @@ const router = createRouter({
     routes,
 });
 
-const default_title = 'GoAdisyon QR Menü';
+const default_title = 'Posis QR Menü';
 router.beforeEach((to, from, next) => {
     document.title = to.meta.title || default_title;
     next();
